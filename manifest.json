@@ -2,7 +2,7 @@
   "name": "Rebobina motor",
   "short_name": "Rebobina",
   "description": "Cálculo de rebobinagem industrial com inteligência WEG",
-  "start_url": "./index.html",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#111827",
   "theme_color": "#1E3A8A",
