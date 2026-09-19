@@ -1,0 +1,7 @@
+{
+  "name": "Rebobina motor",
+  "description": "Cálculo e dimensionamento de rebobinagem para motores elétricos industriais de indução trifásicos e monofásicos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
