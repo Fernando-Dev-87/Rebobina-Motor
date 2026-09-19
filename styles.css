@@ -21,6 +21,7 @@ body {
     background-color: var(--graphite);
     color: var(--text-primary);
     overflow-x: hidden;
+    -webkit-user-select: none;
 }
 
 header {
@@ -56,6 +57,7 @@ nav button {
     font-size: 14px;
     border-radius: 8px;
     cursor: pointer;
+    transition: 0.2s;
 }
 
 nav button.active {
@@ -83,13 +85,14 @@ main { padding: 16px; padding-bottom: 80px; }
 
 .input-group { margin-bottom: 16px; display: flex; flex-direction: column; }
 .input-group label { font-size: 12px; color: var(--text-sec); margin-bottom: 4px; }
-.input-group input {
+.input-group input, .input-group select {
     background-color: var(--graphite);
     border: 1px solid var(--border);
     color: white;
     padding: 12px;
     border-radius: 8px;
     font-size: 16px;
+    outline: none;
 }
 
 .power-grid { display: flex; gap: 10px; }
@@ -109,6 +112,8 @@ main { padding: 16px; padding-bottom: 80px; }
     font-weight: 700;
 }
 
+.voltage-shortcuts button.active { background-color: var(--cobalt-light); border-color: var(--cobalt-light); }
+
 .btn-primary {
     width: 100%;
     padding: 16px;
@@ -127,10 +132,11 @@ main { padding: 16px; padding-bottom: 80px; }
     border-radius: 20px;
     padding: 20px;
     border: 1.5px solid var(--cobalt);
+    margin-bottom: 20px;
 }
 
 .result-header { display: flex; justify-content: space-between; margin-bottom: 16px; }
-.badge { background: var(--cobalt); padding: 4px 12px; border-radius: 6px; font-weight: 900; }
+.badge { background: var(--cobalt); padding: 4px 12px; border-radius: 6px; font-weight: 900; font-size: 14px; }
 
 .result-grid { display: flex; gap: 10px; margin-bottom: 16px; }
 .result-item { flex: 1; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid transparent; }
@@ -154,4 +160,17 @@ main { padding: 16px; padding-bottom: 80px; }
 .action-buttons { display: flex; gap: 10px; margin-top: 20px; }
 .action-buttons button { flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; border: none; }
 .btn-sec { background: #25D366; color: white; }
-.btn-save { background: var(--surface); color: white; border: 1px solid var(--border) !important; }
+
+/* Capacitor UI */
+.capacitor-results { margin-top: 20px; padding: 16px; background: rgba(59, 130, 246, 0.1); border-radius: 12px; }
+.cap-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+.cap-item strong { color: var(--amber); }
+.cap-warning { font-size: 11px; color: #EF4444; font-weight: 800; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px; }
+
+/* AWG List */
+.search-input { width: 100%; padding: 12px; background: var(--graphite); border: 1px solid var(--border); border-radius: 8px; color: white; margin-bottom: 16px; }
+.awg-grid { display: flex; flex-direction: column; gap: 8px; }
+.awg-card { background: var(--graphite); padding: 12px; border-radius: 8px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.awg-card strong { color: var(--cobalt-light); }
+.awg-card span { font-size: 12px; font-weight: 700; }
+.awg-card small { color: var(--text-sec); }

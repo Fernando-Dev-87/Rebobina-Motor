@@ -7,7 +7,6 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1E3A8A">
     <link rel="stylesheet" href="styles.css">
-    <!-- Ícone para iPhone -->
     <link rel="apple-touch-icon" href="icons/icon-192x192.jpg">
 </head>
 <body>
@@ -122,22 +121,119 @@
 
                         <div class="action-buttons">
                             <button class="btn-sec" onclick="shareToWhatsApp()">WhatsApp</button>
-                            <button class="btn-save" onclick="saveHistory()">Salvar</button>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Telas de Ferragem e Oficina (Simuladas para esta versão inicial) -->
+            <!-- Tela de Ferragem -->
             <section id="tab-ferragem" class="tab-content">
-                <div class="empty-state">Em breve nesta versão Web: Cálculo por Ferragem Completo.</div>
+                <div class="input-card">
+                    <div class="input-header">
+                        <h2>MEDIDAS DA FERRAGEM</h2>
+                        <p>Dedução de motor sem placa</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Diâmetro Interno (D) mm</label>
+                        <input type="number" id="f-diam" value="105.0">
+                    </div>
+                    <div class="input-group">
+                        <label>Comprimento Pacote (L) mm</label>
+                        <input type="number" id="f-len" value="110.0">
+                    </div>
+                    <div class="input-group">
+                        <label>Qtd. Ranhuras (S)</label>
+                        <input type="number" id="f-slots" value="36">
+                    </div>
+
+                    <div class="input-header" style="margin-top:20px">
+                        <h2>ESPECIFICAÇÃO ELÉTRICA</h2>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Tensão Desejada (V)</label>
+                        <input type="number" id="f-volt" value="220">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Polos</label>
+                        <select id="f-poles">
+                            <option value="2">2 Polos (3600 RPM)</option>
+                            <option value="4" selected>4 Polos (1800 RPM)</option>
+                            <option value="6">6 Polos (1200 RPM)</option>
+                            <option value="8">8 Polos (900 RPM)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-primary" onclick="calculateFerragem()">CALCULAR FERRAGEM</button>
+                </div>
+
+                <div id="f-result-container" style="display:none;">
+                    <div class="result-card ferragem">
+                        <div class="result-header">
+                            <h3>POTÊNCIA ESTIMADA</h3>
+                            <div class="badge" id="f-res-cv">5.0 CV</div>
+                        </div>
+
+                        <div class="result-grid">
+                            <div class="result-item amber">
+                                <span>FIO SUGERIDO</span>
+                                <strong id="f-res-wire">AWG 18</strong>
+                            </div>
+                            <div class="result-item cobalt">
+                                <span>ESPIRAS / BOBINA</span>
+                                <strong id="f-res-turns">24</strong>
+                            </div>
+                        </div>
+
+                        <div class="tech-info">
+                            <div class="info-row">
+                                <span>Cobre Estimado:</span>
+                                <strong id="f-res-weight">1.50 kg</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
+            <!-- Tela de Oficina -->
             <section id="tab-oficina" class="tab-content">
                 <div class="input-card">
-                    <h2>TABELA AWG</h2>
-                    <input type="text" placeholder="Pesquisar AWG..." class="search-input">
-                    <div id="awg-table"></div>
+                    <div class="input-header">
+                        <h2>CALCULADORA DE CAPACITORES</h2>
+                        <p>Para Motores Monofásicos</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Potência (CV)</label>
+                        <input type="number" id="cap-cv" value="1.0" oninput="calculateCapacitors()">
+                    </div>
+
+                    <div class="voltage-shortcuts">
+                        <button onclick="setCapVolt(110)" id="btn-cap110">110V</button>
+                        <button onclick="setCapVolt(220)" id="btn-cap220" class="active">220V</button>
+                    </div>
+
+                    <div class="capacitor-results">
+                        <div class="cap-item">
+                            <span>Partida (Eletrolítico):</span>
+                            <strong id="cap-start">430-516 µF</strong>
+                        </div>
+                        <div class="cap-item">
+                            <span>Permanente (Trabalho):</span>
+                            <strong id="cap-perm">25-35 µF</strong>
+                        </div>
+                        <div class="cap-warning">Tensão mínima: <span id="cap-min-v">380V/440V</span></div>
+                    </div>
+                </div>
+
+                <div class="input-card">
+                    <h2>TABELA AWG INTERATIVA</h2>
+                    <input type="text" id="awg-search" placeholder="Pesquisar bitola..." class="search-input" oninput="filterAwg(this.value)">
+                    <div id="awg-list" class="awg-grid">
+                        <!-- Gerado via JS -->
+                    </div>
                 </div>
             </section>
         </main>
