@@ -2,27 +2,29 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Industrial Copper & Electric Blue Palette
-val IndustrialDarkBg = Color(0xFF0B132B)
-val IndustrialDarkSurface = Color(0xFF1C2541)
-val IndustrialDarkSurfaceVariant = Color(0xFF2E3D5E)
+// Premium Industrial Palette (Elite 110%)
+val CobaltBlue = Color(0xFF1E3A8A)
+val CobaltBlueLight = Color(0xFF3B82F6)
+val CobaltBlueDark = Color(0xFF1E40AF)
 
-val IndustrialLightBg = Color(0xFFF1F5F9)
-val IndustrialLightSurface = Color(0xFFFFFFFF)
-val IndustrialLightSurfaceVariant = Color(0xFFE2E8F0)
+val AmberCopper = Color(0xFFF59E0B)
+val AmberCopperLight = Color(0xFFFBBF24)
+val AmberCopperDark = Color(0xFFD97706)
 
-// Accents
-val CopperAmber = Color(0xFFF59E0B)
-val CopperAmberDark = Color(0xFFD97706)
-val ElectricCyan = Color(0xFF0EA5E9)
-val ElectricCyanLight = Color(0xFF38BDF8)
+val GraphiteDark = Color(0xFF111827)
+val GraphiteSurface = Color(0xFF1F2937)
+val SteelBorder = Color(0xFF374151)
 
-// Status colors for factory safety
-val IndustrialWarning = Color(0xFFF97316)
-val IndustrialCritical = Color(0xFFEF4444)
+// Status & Indicators
 val IndustrialSuccess = Color(0xFF10B981)
+val IndustrialWarning = Color(0xFFF59E0B)
+val IndustrialCritical = Color(0xFFEF4444)
 
-val TextPrimaryDark = Color(0xFFF8FAFC)
-val TextSecondaryDark = Color(0xFF94A3B8)
-val TextPrimaryLight = Color(0xFF0F172A)
-val TextSecondaryLight = Color(0xFF475569)
+// Standard Palette References (Backwards compatibility)
+val CopperAmber = AmberCopper
+val ElectricCyan = CobaltBlueLight
+
+val TextPrimaryDark = Color(0xFFF9FAFB)
+val TextSecondaryDark = Color(0xFF9CA3AF)
+val TextPrimaryLight = Color(0xFF111827)
+val TextSecondaryLight = Color(0xFF4B5563)

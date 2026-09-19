@@ -9,6 +9,8 @@ import com.example.domain.model.ValidationReport
 
 data class MotorRewindUiState(
     val powerInput: String = "5.0",
+    val kwInput: String = "3.7",
+    val hpInput: String = "4.9",
     val powerUnit: PowerUnit = PowerUnit.CV,
     val voltageInput: String = "220",
     val phaseType: MotorPhaseType = MotorPhaseType.THREE_PHASE,
@@ -27,7 +29,8 @@ data class MotorRewindUiState(
     val result: CalculationResult? = null,
     val validationReport: ValidationReport = ValidationReport(isValid = true, items = emptyList()),
     val isAdvancedOpen: Boolean = false,
-    val copiedFeedback: Boolean = false
+    val copiedFeedback: Boolean = false,
+    val copperPriceInput: String = "85.00"
 ) {
     fun toDomainInput(): MotorInputData {
         return MotorInputData(

@@ -143,6 +143,10 @@ class FerragemViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun updateCopperPrice(value: String) {
+        _uiState.update { it.copy(copperPriceInput = value) }
+    }
+
     fun saveCalculation(clientName: String) {
         val result = _uiState.value.result ?: return
         val motorDesc = "Ferragem D=${_uiState.value.internalDiameterInput} L=${_uiState.value.packageLengthInput}"

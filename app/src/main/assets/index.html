@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rebobina motor</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1E3A8A">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Ícone para iPhone -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="logo-container">
+                <span class="icon-bolt">⚡</span>
+                <h1>Rebobina motor</h1>
+            </div>
+            <nav>
+                <button onclick="switchTab('calc')" id="btn-calc" class="active">Cálculo</button>
+                <button onclick="switchTab('ferragem')" id="btn-ferragem">Ferragem</button>
+                <button onclick="switchTab('oficina')" id="btn-oficina">Oficina</button>
+            </nav>
+        </header>
+
+        <main id="content">
+            <!-- Tela de Cálculo por Placa -->
+            <section id="tab-calc" class="tab-content active">
+                <div class="input-card">
+                    <div class="input-header">
+                        <h2>CALCULADORA DE MOTOR</h2>
+                        <p>Potência, rotação e tensão</p>
+                    </div>
+
+                    <div class="power-grid">
+                        <div class="input-group">
+                            <label>kW</label>
+                            <input type="number" id="kw-input" placeholder="0.00" oninput="convertFromKw(this.value)">
+                        </div>
+                        <div class="input-group">
+                            <label>HP</label>
+                            <input type="number" id="hp-input" placeholder="0.00" oninput="convertFromHp(this.value)">
+                        </div>
+                    </div>
+
+                    <div class="input-group main-input">
+                        <label>Potência (CV)</label>
+                        <input type="number" id="cv-input" value="5.0" oninput="convertFromCv(this.value)">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Rotação (RPM)</label>
+                        <input type="number" id="rpm-input" value="1800">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Tensão (V)</label>
+                        <input type="number" id="volt-input" value="220">
+                    </div>
+
+                    <div class="voltage-shortcuts">
+                        <button onclick="setVoltage(220)">220/380</button>
+                        <button onclick="setVoltage(380)">380/660</button>
+                        <button onclick="setVoltage(440)">440/760</button>
+                    </div>
+
+                    <button class="btn-primary" onclick="calculateRewind()">CALCULAR</button>
+                </div>
+
+                <div id="result-container" style="display:none;">
+                    <div class="result-card">
+                        <div class="result-header">
+                            <h3>RESULTADO DE BANCADA</h3>
+                            <div id="conn-badge" class="badge">Δ</div>
+                        </div>
+
+                        <div class="result-grid">
+                            <div class="result-item amber">
+                                <span>FIO RECOMENDADO</span>
+                                <strong id="res-wire">AWG 15</strong>
+                                <small id="res-section">1.650 mm²</small>
+                            </div>
+                            <div class="result-item cobalt">
+                                <span>ESPIRAS / BOBINA</span>
+                                <strong id="res-turns">17</strong>
+                                <small id="res-cond">34 cond.</small>
+                            </div>
+                        </div>
+
+                        <div class="tech-info">
+                            <div class="info-row">
+                                <span>Cobre Estimado:</span>
+                                <strong id="res-weight">0.00 kg</strong>
+                            </div>
+                            <div class="info-row">
+                                <span>Corrente (In):</span>
+                                <strong id="res-amps">0.0 A</strong>
+                            </div>
+                        </div>
+
+                        <div class="weg-box">
+                            <div class="weg-header">ESQUEMA TÉCNICO WEG</div>
+                            <div class="info-row">
+                                <span>Bobinas por Grupo:</span>
+                                <strong id="res-bg">3</strong>
+                            </div>
+                            <div class="info-row">
+                                <span>Passo de Fase:</span>
+                                <strong id="res-step">6.0</strong>
+                            </div>
+                        </div>
+
+                        <div class="budget-box">
+                            <span>Orçamento (Cobre kg):</span>
+                            <div class="budget-input">
+                                <label>R$</label>
+                                <input type="number" id="copper-price" value="85.00" oninput="updateBudget()">
+                            </div>
+                            <div class="total-cost">Total: <strong id="res-cost">R$ 0,00</strong></div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn-sec" onclick="shareToWhatsApp()">WhatsApp</button>
+                            <button class="btn-save" onclick="saveHistory()">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Telas de Ferragem e Oficina (Simuladas para esta versão inicial) -->
+            <section id="tab-ferragem" class="tab-content">
+                <div class="empty-state">Em breve nesta versão Web: Cálculo por Ferragem Completo.</div>
+            </section>
+
+            <section id="tab-oficina" class="tab-content">
+                <div class="input-card">
+                    <h2>TABELA AWG</h2>
+                    <input type="text" placeholder="Pesquisar AWG..." class="search-input">
+                    <div id="awg-table"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+    </script>
+</body>
+</html>

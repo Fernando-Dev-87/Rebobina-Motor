@@ -24,5 +24,6 @@ data class FerragemUiState(
     val isAdvancedOpen: Boolean = false,
     val result: FerragemCalculationResult? = null,
     val validationReport: ValidationReport = ValidationReport(isValid = true, items = emptyList()),
-    val copiedFeedback: Boolean = false
+    val copiedFeedback: Boolean = false,
+    val copperPriceInput: String = "85.00"
 )

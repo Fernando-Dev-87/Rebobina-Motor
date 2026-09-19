@@ -5,11 +5,13 @@ import com.example.domain.model.CalculationResult
 import com.example.domain.model.ConnectionType
 import com.example.domain.model.MotorInputData
 import com.example.domain.model.MotorPhaseType
+import com.example.domain.model.PowerUnit
 import com.example.domain.model.ValidationItem
 import com.example.domain.model.ValidationReport
 import com.example.domain.model.ValidationSeverity
 import java.util.Locale
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -89,12 +91,33 @@ object MotorRewindEngine {
 
         // 9. Seção Teórica e Escolha do Fio AWG
         val requiredWireSectionMm2 = conductorCurrent / input.targetCurrentDensity
-        val recommendedWire = AwgTable.findClosestSingleWire(requiredWireSectionMm2)
+        
+        // --- Inteligência de Bitolas (AWG 16-40 para motores < 40CV) ---
+        val restrictedWires = if (input.powerValue < 40.0 && input.powerUnit == PowerUnit.CV) {
+            // Filtra bitolas: AWG 16 (1.309 mm2) até AWG 30 (0.0509 mm2) na nossa tabela atual
+            // A nossa AwgTable vai até 30, vamos considerar o range disponível e limitar a grossura.
+            AwgTable.wires.filter { it.awg in 16..40 }
+        } else {
+            AwgTable.wires
+        }
+
+        // Função local para encontrar no set restrito
+        val recommendedWire = restrictedWires.minByOrNull { wire ->
+            val diff = wire.sectionMm2 - requiredWireSectionMm2
+            if (diff >= 0) diff else abs(diff) * 1.5
+        } ?: AwgTable.findClosestSingleWire(requiredWireSectionMm2)
+
         val actualCurrentDensity = conductorCurrent / recommendedWire.sectionMm2
 
-        // Alternativa em 2 fios em paralelo para seções grandes (AWG 16 ou maior)
-        val parallelAlternative = if (requiredWireSectionMm2 >= 1.0) {
-            AwgTable.findTwoParallelWires(requiredWireSectionMm2)
+        // Alternativa em 2 fios em paralelo (Força paralelo se o único fio for muito grosso)
+        val parallelAlternative = if (requiredWireSectionMm2 >= 1.0 || (input.powerValue < 40.0 && recommendedWire.awg < 16)) {
+            // Calcula paralelo usando fios do range permitido (16+)
+            val halfSection = requiredWireSectionMm2 / 2.0
+            val pWire = restrictedWires.minByOrNull { wire ->
+                val diff = wire.sectionMm2 - halfSection
+                if (diff >= 0) diff else abs(diff) * 1.5
+            } ?: AwgTable.findClosestSingleWire(halfSection)
+            Pair(pWire, pWire.sectionMm2 * 2.0)
         } else {
             null
         }

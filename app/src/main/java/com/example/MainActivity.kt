@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Architecture
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
                             NavigationBarItem(
                                 selected = currentScreen == AppScreen.FERRAMENTAS,
                                 onClick = { currentScreen = AppScreen.FERRAMENTAS },
-                                icon = { Icon(Icons.Default.Build, contentDescription = null) },
+                                icon = { Icon(Icons.Default.Settings, contentDescription = null) },
                                 label = { Text("Oficina") }
                             )
                         }

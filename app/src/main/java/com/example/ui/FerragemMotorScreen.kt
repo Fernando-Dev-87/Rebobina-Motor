@@ -571,6 +571,8 @@ fun FerragemMotorScreen(
                     copiedFeedback = uiState.copiedFeedback,
                     onCopied = { viewModel.notifyCopied() },
                     onSave = { viewModel.saveCalculation(it) },
+                    copperPrice = uiState.copperPriceInput,
+                    onCopperPriceChange = { viewModel.updateCopperPrice(it) },
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             }

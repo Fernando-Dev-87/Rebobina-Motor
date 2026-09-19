@@ -1,27 +1,16 @@
 package com.example.ui.components
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -38,11 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.domain.model.CalculationResult
 import com.example.domain.model.ConnectionType
-import com.example.ui.theme.CopperAmber
-import com.example.ui.theme.ElectricCyan
-import com.example.ui.theme.IndustrialCritical
-import com.example.ui.theme.IndustrialSuccess
-import com.example.ui.theme.IndustrialWarning
+import com.example.ui.theme.*
 import java.util.Locale
 
 @Composable
@@ -51,8 +37,11 @@ fun ResultCard(
     copiedFeedback: Boolean,
     onCopied: () -> Unit,
     onSave: (String) -> Unit = {},
+    copperPrice: String = "85.00",
+    onCopperPriceChange: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     var showSaveDialog by remember { mutableStateOf(false) }
     var clientName by remember { mutableStateOf("") }
@@ -73,7 +62,7 @@ fun ResultCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Cabeçalho com Badge de Fio AWG e Ligação
+            // Cabeçalho
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -94,16 +83,17 @@ fun ResultCard(
                     )
                 }
 
-                // Badge de Ligação (Estrela / Triângulo) - Apenas o Símbolo
                 Surface(
                     shape = RoundedCornerShape(8.dp),
                     color = MaterialTheme.colorScheme.secondaryContainer,
-                    border = BorderStroke(1.dp, ElectricCyan.copy(alpha = 0.5f))
+                    border = BorderStroke(1.dp, CobaltBlueLight.copy(alpha = 0.5f))
                 ) {
-                    Box(
+                    Row(
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                        contentAlignment = Alignment.Center
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        ConnectionDiagram(type = result.connectionType, modifier = Modifier.size(20.dp))
                         Text(
                             text = result.connectionType.symbol,
                             fontWeight = FontWeight.Black,
@@ -116,7 +106,7 @@ fun ResultCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // SEÇÃO 1: OPÇÕES DE BANCADA (MOSTRADO PRIMEIRO)
+            // SEÇÃO 1: OPÇÕES DE BANCADA
             Surface(
                 shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f),
@@ -134,44 +124,26 @@ fun ResultCard(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Destaque de 1 Fio e 2 Fios em Paralelo
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Opção 1: Fio Simples
+                        // Opção 1
                         Surface(
                             shape = RoundedCornerShape(8.dp),
                             color = MaterialTheme.colorScheme.surface,
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Column(
-                                modifier = Modifier.padding(10.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "OPÇÃO 1 (1 FIO)",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                            Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("OPÇÃO 1 (1 FIO)", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Spacer(modifier = Modifier.height(2.dp))
-                                Text(
-                                    text = "AWG ${result.recommendedWire.awg}",
-                                    fontSize = 17.sp,
-                                    fontWeight = FontWeight.Black,
-                                    color = CopperAmber
-                                )
-                                Text(
-                                    text = String.format(Locale.US, "%.3f mm²", result.recommendedWire.sectionMm2),
-                                    fontSize = 10.5.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                Text("AWG ${result.recommendedWire.awg}", fontSize = 17.sp, fontWeight = FontWeight.Black, color = AmberCopper)
+                                Text(String.format(Locale.US, "%.3f mm²", result.recommendedWire.sectionMm2), fontSize = 10.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
 
-                        // Opção 2: Fio Duplo em Paralelo
+                        // Opção 2
                         if (result.parallelWireAlternative != null) {
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
@@ -179,28 +151,11 @@ fun ResultCard(
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Column(
-                                    modifier = Modifier.padding(10.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = "OPÇÃO 2 (2 FIOS)",
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text("OPÇÃO 2 (2 FIOS)", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = "2x AWG ${result.parallelWireAlternative.first.awg}",
-                                        fontSize = 17.sp,
-                                        fontWeight = FontWeight.Black,
-                                        color = CopperAmber
-                                    )
-                                    Text(
-                                        text = String.format(Locale.US, "Tot: %.3f mm²", result.parallelWireAlternative.second),
-                                        fontSize = 10.5.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                    Text("2x AWG ${result.parallelWireAlternative.first.awg}", fontSize = 17.sp, fontWeight = FontWeight.Black, color = AmberCopper)
+                                    Text(String.format(Locale.US, "Tot: %.3f mm²", result.parallelWireAlternative.second), fontSize = 10.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                         }
@@ -208,39 +163,19 @@ fun ResultCard(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Espiras por Bobina na Bancada
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = MaterialTheme.colorScheme.surface,
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 12.dp, vertical = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "ESPIRAS / BOBINA",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "${result.conductorsPerSlot} condutores por ranhura",
-                                    fontSize = 10.5.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                        Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+                            Text("ESPIRAS / BOBINA:", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(Modifier.height(4.dp))
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                Text("${result.turnsPerCoil} espiras", fontSize = 18.sp, fontWeight = FontWeight.Black, color = CobaltBlueLight)
+                                Text("${result.conductorsPerSlot} cond./ranhura", fontSize = 10.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
-                            Text(
-                                text = "${result.turnsPerCoil} espiras",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Black,
-                                color = ElectricCyan
-                            )
                         }
                     }
                 }
@@ -248,19 +183,11 @@ fun ResultCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Indicador de Densidade de Corrente (J)
+            // Indicador de Densidade
             val densityColor = when {
                 result.actualCurrentDensity > 6.0 -> IndustrialCritical
                 result.actualCurrentDensity > 5.5 -> IndustrialWarning
-                result.actualCurrentDensity < 3.0 -> IndustrialWarning
                 else -> IndustrialSuccess
-            }
-
-            val densityStatusLabel = when {
-                result.actualCurrentDensity > 6.0 -> "PERIGO: Risco de queima por sobreaquecimento"
-                result.actualCurrentDensity > 5.5 -> "Atenção: Densidade no limite superior"
-                result.actualCurrentDensity < 3.0 -> "Aviso: Subdimensionado (ranhura cheia)"
-                else -> "Densidade Segura (Norma ABNT/NEMA)"
             }
 
             Surface(
@@ -269,139 +196,101 @@ fun ResultCard(
                 border = BorderStroke(1.dp, densityColor.copy(alpha = 0.4f)),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(10.dp)
-                            .clip(CircleShape)
-                            .background(densityColor)
-                    )
+                Row(modifier = Modifier.fillMaxWidth().padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(densityColor))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = String.format(Locale.US, "Densidade Real (J): %.2f A/mm²", result.actualCurrentDensity),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
-                            color = densityColor
-                        )
-                        Text(
-                            text = densityStatusLabel,
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+                    Text(String.format(Locale.US, "Densidade Real (J): %.2f A/mm²", result.actualCurrentDensity), fontWeight = FontWeight.Bold, fontSize = 13.sp, color = densityColor)
                 }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
 
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 4.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-            )
-
-            // Grid de dados técnicos detalhados
-            Row(modifier = Modifier.fillMaxWidth()) {
-                TechParamItem(
-                    label = "Corrente Nominal (In)",
-                    value = String.format(Locale.US, "%.2f A", result.nominalCurrentAmps),
-                    modifier = Modifier.weight(1f)
-                )
-                TechParamItem(
-                    label = "Corrente de Fase (If)",
-                    value = String.format(Locale.US, "%.2f A", result.phaseCurrentAmps),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Row(modifier = Modifier.fillMaxWidth()) {
-                TechParamItem(
-                    label = "Fluxo Magnético / Polo",
-                    value = String.format(Locale.US, "%.4f Wb", result.magneticFluxWeber),
-                    modifier = Modifier.weight(1f)
-                )
-                TechParamItem(
-                    label = "Peso de Cobre Est.",
-                    value = String.format(Locale.US, "%.2f kg", result.estimatedCopperWeightKg),
-                    modifier = Modifier.weight(1f)
-                )
+            // Grid Técnico
+            Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                TechParamItem("Corrente Nominal (In)", String.format(Locale.US, "%.2f A", result.nominalCurrentAmps), Modifier.weight(1f))
+                TechParamItem("Cobre Estimado", String.format(Locale.US, "%.2f kg", result.estimatedCopperWeightKg), Modifier.weight(1f))
             }
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Seção de Esquema WEG
+            // SEÇÃO DE ORÇAMENTO
             Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("ESQUEMA TÉCNICO WEG", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
-                        Text("Bobinas por Grupo: ${if (result.coilsPerGroup % 1.0 == 0.0) result.coilsPerGroup.toInt() else String.format(Locale.US, "%.1f", result.coilsPerGroup)}", fontSize = 12.sp)
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.ElectricBolt, contentDescription = null, tint = AmberCopper, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("INTELIGÊNCIA DE ORÇAMENTO", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
                     }
-                    Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
-                        Text("Passo de Fase (Defasagem)", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("${String.format(Locale.US, "%.1f", result.phaseStep)} ranhuras", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(8.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            value = copperPrice,
+                            onValueChange = onCopperPriceChange,
+                            label = { Text("Preço Cobre/kg", fontSize = 10.sp) },
+                            modifier = Modifier.weight(1f),
+                            prefix = { Text("R$ ") },
+                            singleLine = true
+                        )
+                        val totalCost = (copperPrice.toDoubleOrNull() ?: 85.0) * result.estimatedCopperWeightKg
+                        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
+                            Text("Custo Material", style = MaterialTheme.typography.labelSmall, color = TextSecondaryDark)
+                            Text("R$ ${String.format(Locale.US, "%.2f", totalCost)}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = AmberCopper)
+                        }
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Botão de Cópia para Clipboard
-            Button(
-                onClick = {
-                    clipboardManager.setText(AnnotatedString(result.copyableSummary))
-                    onCopied()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("copy_summary_button"),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (copiedFeedback) IndustrialSuccess else MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = if (copiedFeedback) Color.White else MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            ) {
-                Icon(
-                    imageVector = if (copiedFeedback) Icons.Default.Check else Icons.Default.ContentCopy,
-                    contentDescription = "Copiar resumo para área de transferência",
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = if (copiedFeedback) "Resumo Copiado para a Bancada!" else "Copiar Resumo dos Dados",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
+            // Ações
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = {
+                        clipboardManager.setText(AnnotatedString(result.copyableSummary))
+                        onCopied()
+                    },
+                    modifier = Modifier.weight(1.2f).height(48.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = if (copiedFeedback) IndustrialSuccess else MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(if (copiedFeedback) Icons.Default.Check else Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Copiar", fontWeight = FontWeight.Bold)
+                }
+
+                OutlinedButton(
+                    onClick = {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, result.copyableSummary)
+                            type = "text/plain"
+                            setPackage("com.whatsapp")
+                        }
+                        try { context.startActivity(sendIntent) } catch (e: Exception) {
+                            context.startActivity(Intent.createChooser(sendIntent, "Enviar via"))
+                        }
+                    },
+                    modifier = Modifier.weight(1f).height(48.dp),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("WhatsApp", fontWeight = FontWeight.Bold)
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedButton(
-                onClick = { showSaveDialog = true },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
+            OutlinedButton(onClick = { showSaveDialog = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp)) {
                 Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Salvar no Histórico", fontWeight = FontWeight.Bold)
+                Text("Salvar Histórico", fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -411,12 +300,7 @@ fun ResultCard(
             onDismissRequest = { showSaveDialog = false },
             title = { Text("Salvar Serviço") },
             text = {
-                OutlinedTextField(
-                    value = clientName,
-                    onValueChange = { clientName = it },
-                    label = { Text("Nome do Cliente / OS") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                OutlinedTextField(value = clientName, onValueChange = { clientName = it }, label = { Text("Nome do Cliente / OS") }, modifier = Modifier.fillMaxWidth())
             },
             confirmButton = {
                 Button(onClick = {
@@ -425,37 +309,17 @@ fun ResultCard(
                         showSaveDialog = false
                         clientName = ""
                     }
-                }) {
-                    Text("Salvar")
-                }
+                }) { Text("Salvar") }
             },
-            dismissButton = {
-                TextButton(onClick = { showSaveDialog = false }) {
-                    Text("Cancelar")
-                }
-            }
+            dismissButton = { TextButton(onClick = { showSaveDialog = false }) { Text("Cancelar") } }
         )
     }
 }
 
 @Composable
-private fun TechParamItem(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
+private fun TechParamItem(label: String, value: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Text(
-            text = label,
-            fontSize = 11.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        Text(text = label, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text = value, fontSize = 13.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurface)
     }
 }

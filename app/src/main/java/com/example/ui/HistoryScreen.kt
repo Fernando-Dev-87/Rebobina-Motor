@@ -1,13 +1,15 @@
 package com.example.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.PictureAsPdf
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,6 +33,7 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = viewModel()
 ) {
     val services by viewModel.allServices.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
     val context = LocalContext.current
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
@@ -42,9 +45,23 @@ fun HistoryScreen(
 
         Spacer(Modifier.height(16.dp))
 
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { viewModel.updateSearchQuery(it) },
+            label = { Text("Pesquisar Cliente ou Motor") },
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            shape = RoundedCornerShape(12.dp)
+        )
+
+        Spacer(Modifier.height(16.dp))
+
         if (services.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Nenhum serviço salvo ainda.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    text = if (searchQuery.isBlank()) "Nenhum serviço salvo ainda." else "Nenhum resultado encontrado.", 
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         } else {
             LazyColumn(
@@ -74,18 +91,20 @@ fun ServiceItem(
     
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Column {
-                    Text(service.clientName, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(service.motorDescription, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(sdf.format(Date(service.dateTimestamp)), fontSize = 11.sp, color = MaterialTheme.colorScheme.outline)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(service.clientName, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp, color = MaterialTheme.colorScheme.primary)
+                    Text(service.motorDescription, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface)
+                    Text(sdf.format(Date(service.dateTimestamp)), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Row {
                     IconButton(onClick = onPdf) {
-                        Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF", tint = MaterialTheme.colorScheme.primary)
+                        Icon(Icons.Default.PictureAsPdf, contentDescription = "Gerar PDF", tint = MaterialTheme.colorScheme.secondary)
                     }
                     IconButton(onClick = onDelete) {
                         Icon(Icons.Default.Delete, contentDescription = "Excluir", tint = MaterialTheme.colorScheme.error)

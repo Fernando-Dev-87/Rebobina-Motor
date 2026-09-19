@@ -328,11 +328,31 @@ fun MotorRewindScreen(
                             modifier = Modifier.weight(0.95f),
                             verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            // 1. Potência (CV)
+                            // 1. Conversão Automática (kW / HP) - AGORA NO TOPO
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                IndustrialNumberInput(
+                                    label = "kW",
+                                    value = uiState.kwInput,
+                                    onValueChange = { viewModel.updateKw(it) },
+                                    suffix = "kW",
+                                    modifier = Modifier.weight(1f),
+                                    testTag = "preset_input_kw"
+                                )
+                                IndustrialNumberInput(
+                                    label = "HP",
+                                    value = uiState.hpInput,
+                                    onValueChange = { viewModel.updateHp(it) },
+                                    suffix = "HP",
+                                    modifier = Modifier.weight(1f),
+                                    testTag = "preset_input_hp"
+                                )
+                            }
+
+                            // 2. Potência (CV Principal) - Logo abaixo de kW/HP
                             IndustrialNumberInput(
-                                label = "Potência",
+                                label = "Potência (CV)",
                                 value = uiState.powerInput,
-                                onValueChange = { viewModel.updatePresetCv(it) },
+                                onValueChange = { viewModel.updatePower(it) },
                                 suffix = "CV",
                                 modifier = Modifier.fillMaxWidth(),
                                 testTag = "preset_input_cv"
@@ -358,30 +378,35 @@ fun MotorRewindScreen(
                                 testTag = "preset_input_voltage"
                             )
 
-                            // Atalhos rápidos de tensão em 1 toque
+                            // Atalhos rápidos de tensão em 1 toque - Padrões Industriais
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                listOf("220", "380", "440").forEach { volt ->
+                                val voltages = listOf(
+                                    "220/380" to "220",
+                                    "380/660" to "380",
+                                    "440/760" to "440"
+                                )
+                                voltages.forEach { (label, value) ->
                                     Surface(
                                         shape = RoundedCornerShape(4.dp),
-                                        color = if (uiState.voltageInput == volt) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                        color = if (uiState.voltageInput == value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
                                         modifier = Modifier
                                             .weight(1f)
                                             .clickable {
-                                                viewModel.updatePresetVoltage(volt)
+                                                viewModel.updatePresetVoltage(value)
                                                 viewModel.calculatePreset()
                                             }
                                     ) {
                                         Text(
-                                            text = "${volt}V",
-                                            fontSize = 10.sp,
+                                            text = label,
+                                            fontSize = 9.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = if (uiState.voltageInput == volt) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                                            color = if (uiState.voltageInput == value) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                                             textAlign = TextAlign.Center,
-                                            modifier = Modifier.padding(vertical = 3.dp)
+                                            modifier = Modifier.padding(vertical = 4.dp)
                                         )
                                     }
                                 }
@@ -389,7 +414,7 @@ fun MotorRewindScreen(
 
                             // BOTÃO PARA CALCULAR AO CLICAR
                             Button(
-                                onClick = { viewModel.calculatePreset() },
+                                onClick = { viewModel.calculate() },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(42.dp)
@@ -504,18 +529,17 @@ fun MotorRewindScreen(
                                             }
                                         }
 
-                                        // Linha de Espiras por Bobina
+                                        // Linha de Espiras por Bobina - Ajustada para Vertical
                                         Surface(
                                             shape = RoundedCornerShape(6.dp),
                                             color = MaterialTheme.colorScheme.surface,
                                             modifier = Modifier.fillMaxWidth()
                                         ) {
-                                            Row(
+                                            Column(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .padding(horizontal = 6.dp, vertical = 4.dp),
-                                                horizontalArrangement = Arrangement.SpaceBetween,
-                                                verticalAlignment = Alignment.CenterVertically
+                                                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                                                verticalArrangement = Arrangement.Center
                                             ) {
                                                 Text(
                                                     text = "Espiras:",
@@ -525,7 +549,7 @@ fun MotorRewindScreen(
                                                 )
                                                 Text(
                                                     text = "${result.turnsPerCoil} esp. (${result.conductorsPerSlot} cond.)",
-                                                    fontSize = 10.5.sp,
+                                                    fontSize = 11.sp,
                                                     fontWeight = FontWeight.Black,
                                                     color = MaterialTheme.colorScheme.primary
                                                 )
@@ -644,6 +668,8 @@ fun MotorRewindScreen(
                     copiedFeedback = uiState.copiedFeedback,
                     onCopied = { viewModel.notifyCopied() },
                     onSave = { viewModel.saveCalculation(it) },
+                    copperPrice = uiState.copperPriceInput,
+                    onCopperPriceChange = { viewModel.updateCopperPrice(it) },
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             }

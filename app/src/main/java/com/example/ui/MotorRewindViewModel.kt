@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import java.util.Locale
 
 class MotorRewindViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -34,7 +35,38 @@ class MotorRewindViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     fun updatePower(value: String) {
-        _uiState.update { it.copy(powerInput = value) }
+        val cv = value.toDoubleOrNull() ?: 0.0
+        val kw = cv * 0.7355
+        val hp = cv * 0.9863
+        _uiState.update { it.copy(
+            powerInput = value,
+            kwInput = String.format(Locale.US, "%.2f", kw),
+            hpInput = String.format(Locale.US, "%.2f", hp)
+        ) }
+        recalculate()
+    }
+
+    fun updateKw(value: String) {
+        val kw = value.toDoubleOrNull() ?: 0.0
+        val cv = kw / 0.7355
+        val hp = cv * 0.9863
+        _uiState.update { it.copy(
+            kwInput = value,
+            powerInput = String.format(Locale.US, "%.2f", cv),
+            hpInput = String.format(Locale.US, "%.2f", hp)
+        ) }
+        recalculate()
+    }
+
+    fun updateHp(value: String) {
+        val hp = value.toDoubleOrNull() ?: 0.0
+        val cv = hp / 0.9863
+        val kw = cv * 0.7355
+        _uiState.update { it.copy(
+            hpInput = value,
+            powerInput = String.format(Locale.US, "%.2f", cv),
+            kwInput = String.format(Locale.US, "%.2f", kw)
+        ) }
         recalculate()
     }
 
@@ -237,6 +269,14 @@ class MotorRewindViewModel(application: Application) : AndroidViewModel(applicat
             delay(2500)
             _uiState.update { it.copy(copiedFeedback = false) }
         }
+    }
+
+    fun calculate() {
+        recalculate()
+    }
+
+    fun updateCopperPrice(value: String) {
+        _uiState.update { it.copy(copperPriceInput = value) }
     }
 
     fun saveCalculation(clientName: String) {
